@@ -1,0 +1,161 @@
+M           = ./mods
+S           = ./src
+B           = ./obj
+IP          = ./interpos
+
+
+FFLAGS      = -r8 -O0 -I$(M) -I$(IP) -module $(M)
+FFLAGS      = -r8 -O1 -I$(M) -I$(IP) -module $(M)
+#FFLAGS      = -debug-parameters all -traceback -ftrapuv -g -fpe0 -r8 -O1 -I$(M) -I$(IP) -module $(M)
+#FFLAGS      = -debug-parameters all -ftrapuv -g -fpe0 -r8 -O1 -I$(M) -I$(IP) -module $(M)
+#FFLAGS      = -C -traceback -r8 -O1 -I$(M) -I$(IP) -module $(M)
+#FFLAGS      = -traceback -r8 -O1 -I$(M) -I$(IP) -module $(M)
+#FFLAGS      = -r8 -O3 -xT -I$(M) -I$(IP) -module $(M)
+#FFLAGS      = -r8 -O3 -pg -I$(M) -I$(IP) -module $(M)
+#FFLAGS	     = -traceback -C -r8 -O3 -xT -I$(M) -I$(IP) -module $(M)
+# -convert big_endian
+FUTILS      = ./futils/src
+
+FUFLAGS     = -I$(FUTILS) -I$(HDF5)/lib -I$(HDF5)/include
+
+LDFLAGS = -i-dynamic -L$(FUTILS) -L$(HDF5)/lib
+#LIBS =  -lfutils -lhdf5_fortran -lhdf5 -lz -lgcc_s -lcrypt -lssl
+LIBS =  -lfutils -lhdf5_fortran -lhdf5 -lz -lgcc_s -lcrypt -lssl
+
+FC	    = mpif90
+
+
+# -------------------------------------------------------------------------
+# -- Fortran MAIN Program File
+# -------------------------------------------------------------------------
+
+F_FILES     =                           \
+	$(S)/modules.f			\
+	$(S)/rand.f			\
+	$(S)/walltime.f			\
+	$(S)/main.f			\
+	$(S)/emperor.f			\
+	$(S)/datain.f			\
+	$(S)/outputterp.f		\
+	$(S)/outputleman.f		\
+	$(S)/extrap.f			\
+	$(S)/array.f 			\
+	$(S)/makeinputrandom.f		\
+	$(S)/interpolation.f 		\
+	$(S)/updatenu.f			\
+	$(S)/moments.f			\
+	$(S)/distfun.f			\
+	$(S)/findsigma.f		\
+	$(S)/inputvmec.f		\
+	$(S)/inputleman.f		\
+        $(S)/solverRK.f 		\
+	$(S)/systEDO.f 			\
+	$(S)/rungekutta2.f 		\
+        $(S)/rungekuttamixte.f 		\
+	$(S)/rungekutta4mixte.f 	\
+	$(S)/systEDOmixte.f		\
+	$(S)/changepitch.f 		\
+	$(S)/airy.f			\
+	$(S)/aairy.f			\
+	$(S)/makekicks.f		\
+	$(S)/varstep.f			
+
+# -------------------------------------------------------------------------
+# -- Object Files
+# -------------------------------------------------------------------------
+
+O_FILES     =                                \
+	$(B)/modules.o			\
+	$(B)/rand.o			\
+	$(B)/walltime.o			\
+	$(B)/main.o			\
+	$(B)/emperor.o			\
+	$(B)/datain.o			\
+	$(B)/outputterp.o		\
+	$(B)/outputleman.o		\
+	$(B)/extrap.o			\
+	$(B)/array.o 			\
+	$(B)/makeinputrandom.o		\
+	$(B)/interpolation.o		\
+	$(B)/updatenu.o			\
+	$(B)/moments.o			\
+	$(B)/distfun.o			\
+	$(B)/findsigma.o		\
+	$(B)/inputvmec.o		\
+	$(B)/inputleman.o		\
+        $(B)/solverRK.o 		\
+	$(B)/systEDO.o 			\
+	$(B)/rungekutta2.o 		\
+        $(B)/rungekuttamixte.o 		\
+	$(B)/rungekutta4mixte.o 	\
+	$(B)/systEDOmixte.o		\
+	$(B)/changepitch.o 		\
+	$(B)/airy.o			\
+	$(B)/aairy.o			\
+        $(B)/makekicks.o		\
+	$(B)/varstep.o			
+
+# -------------------------------------------------------------------------
+# -- Module Files
+# -------------------------------------------------------------------------
+
+M_FILES     =                                 \
+        $(M)/dimarray.mod		\
+	$(M)/hkinclude.mod		\
+	$(M)/para.mod			\
+	$(M)/particle.mod		\
+	$(M)/plasma.mod			\
+	$(M)/terp.mod			\
+	$(M)/mt19937.mod
+
+# -------------------------------------------------------------------------
+# -- Executable File
+# -------------------------------------------------------------------------
+
+X_FILES     =                                 \
+	 venus.x
+
+# -------------------------------------------------------------------------
+# -- Default Rules and Suffixes
+# -------------------------------------------------------------------------
+
+.SUFFIXES:
+
+# -------------------------------------------------------------------------
+# -- Dependency Rules and Explicit Dependencies
+# -------------------------------------------------------------------------
+
+all: FIRST_ACTION \
+     $(X_FILES)   \
+     LAST_ACTION
+
+$(X_FILES): dirs $(O_FILES)
+#	@echo " ### LINKING $@... ###"
+	$(FC) $(FFLAGS) $(LDFLAGS) $(I_PATH) -o $@ $(O_FILES) $(EXT_O_FILES) ./interpos/varlaprout2.f90 ./interpos/varlaprout.f90 ./interpos/interpos.o $(LIBS)
+
+clean:
+#	@echo " ### CLEANING UP... ###"
+	rm -f $(X_FILES) core a.out $(X)/core $(X)/a.out
+	rm -f $(O_FILES)
+	rm -f $(M)/*
+	rm -rf $(L)
+#	@echo " ### DONE ###"
+
+dirs:
+#	mkdir -p $(B) $(L) $(X)
+
+FIRST_ACTION:
+#	@echo " #############################"
+#	@echo " ### UPDATING $(X_FILES)"
+#	@echo " #############################"
+
+LAST_ACTION:
+#	@echo " #############"
+#	@echo " ### DONE. ###"
+#	@echo " #############"
+
+
+$(O_FILES):
+#	@echo " "
+#	@echo " ### COMPILING $(S)/$(@F:.o=.f) ###"
+	$(FC) $(FFLAGS) $(FUFLAGS)  -c -o $@ $(S)/$(@F:.o=.f)

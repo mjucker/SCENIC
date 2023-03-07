@@ -1,0 +1,61 @@
+
+PROG =	venus.x
+
+SRCS =  ./src/modules.f ./src/main.f ./src/emperor.f ./src/datain.f \
+./src/outputleman.f ./src/outputterp.f  ./src/extrap.f \
+./src/rand.f ./src/array.f ./src/makeinputrandom.f \
+./src/interpolation.f ./src/updatenu.f \
+./src/moments.f ./src/distfun.f ./src/findsigma.f ./src/inputvmec.f ./src/inputleman.f \
+./src/solverRK.f ./src/systEDO.f ./src/rungekutta2.f ./src/rungekuttamixte.f ./src/rungekutta4mixte.f ./src/systEDOmixte.f \
+./src/changepitch.f ./src/airy.f ./src/makekicks.f ./src/varstep.f
+
+
+OBJS = ./obj/modules.o ./obj/main.o ./obj/emperor.o ./obj/datain.o \
+./obj/outputleman.o ./obj/outputterp.o ./obj/extrap.o \
+./obj/rand.o ./obj/array.o ./obj/makeinputrandom.o \
+./obj/interpolation.o ./obj/updatenu.o \
+./obj/moments.o ./obj/distfun.o ./obj/findsigma.o ./obj/inputvmec.o ./obj/inputleman.o \
+./obj/solverRK.o ./obj/systEDO.o ./obj/rungekutta2.o ./obj/rungekuttamixte.o ./obj/rungekutta4mixte.o ./obj/systEDOmixte.o \
+./obj/changepitch.o ./obj/airy.o ./obj/makekicks.o ./obj/varstep.o
+ 
+
+
+
+CC = cc
+CFLAGS = -O
+FC = mpfort
+#FC= f90
+FFLAGS = -q64 -qrealsize=8 -qarch=pwr5 -qtune=pwr5 -qmoddir=./mods/ -I./mods/ -I./interpos  
+#-O5 -qstrict -qarch=pwr5 -qtune=pwr5
+# -qautodbl=dbl8 -q64 -O5 -qarch=pwr5 -qtune=pwr5 -qstrict
+# -compiler xlf90_r -q64
+#-w -O3 -xW -FR -vec_report1
+#FFLAGS = -CB -CA -w -g -FR $(FFTWINC)
+#FFLAGS = -CB -FR $(FFTWINC)
+#FFLAGS = -r8 -64 -ansi -C -g
+F90 = $(FC)
+F90FLAGS = $(FFLAGS)
+LDFLAGS = $(FFLAGS)
+#LDFLAGS = $(FFLAGS) 
+#-qnosave -compiler xlf90_r -q64
+
+all: $(PROG)
+
+$(PROG): $(OBJS)
+	$(FC) $(LDFLAGS) -o $@ $(OBJS) \
+./src/walltime.o \
+./interpos/interpos.o \
+./interpos/varlaprout2.o ./interpos/varlaprout.o ./infnan/infnan.o
+
+clean:
+	rm -f $(PROG) $(OBJS) ./mods/* 
+	ln -s ../interpos/interpos.mod ./mods/
+	ln -s ../infnan/inf_nan_detection.mod ./mods/
+#	ln -s ../interpos/interpos.o ./obj/
+
+.SUFFIXES: 
+
+$(OBJS):
+	$(FC) $(FFLAGS)  -c -o $@ ./src/$(@F:.o=.f)
+
+
