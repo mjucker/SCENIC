@@ -1,0 +1,24 @@
+f90 files to use cubic spline with tension
+
+also test program: cbspltest.f90
+
+To obtain module:
+
+f90 -c prec_rkind.f90
+f90 -c interpos.f90
+
+Then, using system (on the suns) LAPACK double precision routines:
+f90 interpos.o cbspltest.f90 -xlic_lib=sunperf
+a.out > output.m
+
+If LAPACKroutines not available, they are in varlaprout2.f90 varlaprout.f90:
+f90 varlaprout2.f90 varlaprout.f90 interpos.o cbspltest.f90  (in that order)
+a.out > output.m
+
+in matlab:
+output  % gets variables: in, out, outsplibnd
+plot(in(:,1),in(:,2),'*-')
+hold on
+plot(out(:,1),out(:,2),'r-')
+plot(outsplibnd(:,1),outsplibnd(:,2),'g--')
+plot(out(:,1),out(:,3),'r-') % etc
