@@ -1,0 +1,317 @@
+# -------------------------------------------------------------------------
+# FILE    : Makefile.template
+# AUTHOR  : Michael F. Hodous (CSCS)
+# UPDATED : Stefan Haberhauer (NEC-ESS), Anthony Cooper (CRPP-EPFL)
+# LAST REV: 10-Apr-2001
+# -------------------------------------------------------------------------
+# Automatically generated Makefile TEMPLATE for Unix/SUPER-UX at CSCS
+# -------------------------------------------------------------------------
+
+#PLATFORM    = SUPER-UX
+#SHELL       = /bin/csh
+#MAKESHELL   = /bin/csh
+
+S           = ./src
+I           = ./include
+B           = ./obj
+L           = ./lst
+X           = ./bin
+
+# -------------------------------------------------------------------------
+# -- Compilation Macros
+# -------------------------------------------------------------------------
+
+#FC          = f77sx
+# NEC-SX Xenvironment (Sun)
+#FC          = sxf90
+# NEC-SX native
+FC           = ifort
+#DEFINES     = DSX3 DV64BIT DTHREED DASYM DFREEBOUND DRECONST DNOPLASMA DNOBLAS
+#DEFINES     = -DNECSX -DV32BIT -DTHREED -DFREEBOUND
+#FFLAGS      = -cpp $(DEFINES) -float2 -pvctl vr256 fullmsg noassume vwork=stack
+#FFLAGS      = -Chopt -sx4 -float0 -ew -Ep $(DEFINES) \
+#              -Wf"-pvctl vr256 noassume loopcnt=100000 vwork=stack vworksz=4M"
+#FFLAGS      = -w -r8 -i4 -O3 -xW -parallel
+#FFLAGS      = -w -r8 -i4 -O -tpp2
+#FFLAGS      = -w -r8 -i4 -O3 -xW
+#FFLAGS      = -w -r8 -i4 -O2 -tpp2 -fnsplit -ftz -ip -ipo
+FFLAGS      = -w -r8 -i4 -O3 -align dcommons
+
+# -------------------------------------------------------------------------
+# -- External Object Files and Libraries:
+# -- example:  ( EXT_O_FILES = /users/user_name/proj/lib/auxmat.o )
+# -------------------------------------------------------------------------
+
+EXT_O_FILES = -Vaxlib
+
+# -------------------------------------------------------------------------
+# -- Location of Include Files: (for directives like 'INCLUDE filename')
+# -- example:  ( I_PATH = -I/users/user_name/proj/include )
+# -------------------------------------------------------------------------
+
+I_PATH      =                                 \
+        -I$(S) -I$(I)
+
+# -------------------------------------------------------------------------
+# -- Fortran MAIN Program File
+# -------------------------------------------------------------------------
+
+F_FILES     =                                 \
+        $(S)/vmec.f                           \
+        $(S)/BLOCKDATA1.f                     \
+        $(S)/alias.f                          \
+        $(S)/bcovar.f                         \
+        $(S)/bss.f                            \
+        $(S)/convert.f                        \
+        $(S)/difvol.f                         \
+        $(S)/eqfor.f                          \
+        $(S)/eqsolve.f                        \
+        $(S)/evolve.f                         \
+        $(S)/extrap.f                         \
+        $(S)/fixaray.f                        \
+        $(S)/forces.f                         \
+        $(S)/funct3d.f                        \
+        $(S)/functions90_it.f                 \
+        $(S)/getfsq.f                         \
+        $(S)/getiota.f                        \
+        $(S)/interp.f                         \
+        $(S)/jacobian.f                       \
+        $(S)/lamcal.f                         \
+        $(S)/output.f                         \
+        $(S)/precondn.f                       \
+        $(S)/pressure.f                       \
+        $(S)/printout.f                       \
+        $(S)/profil3d.f                       \
+        $(S)/readin.f                         \
+        $(S)/residue.f                        \
+        $(S)/restart.f                        \
+        $(S)/scalfor.f                        \
+        $(S)/spectrum.f                       \
+        $(S)/tomnsp.f                         \
+        $(S)/totzsp.f                         \
+        $(S)/trid.f                           \
+        $(S)/vsetup.f                         \
+        $(S)/wrout.f                          
+
+# -------------------------------------------------------------------------
+# -- Object Files
+# -------------------------------------------------------------------------
+
+O_FILES     =                                 \
+        $(B)/vmec.o                           \
+        $(B)/BLOCKDATA1.o                     \
+        $(B)/alias.o                          \
+        $(B)/bcovar.o                         \
+        $(B)/bss.o                            \
+        $(B)/convert.o                        \
+        $(B)/difvol.o                         \
+        $(B)/eqfor.o                          \
+        $(B)/eqsolve.o                        \
+        $(B)/evolve.o                         \
+        $(B)/extrap.o                         \
+        $(B)/fixaray.o                        \
+        $(B)/forces.o                         \
+        $(B)/funct3d.o                        \
+        $(S)/functions90_it.o                 \
+        $(B)/getfsq.o                         \
+        $(B)/getiota.o                        \
+        $(B)/interp.o                         \
+        $(B)/jacobian.o                       \
+        $(B)/lamcal.o                         \
+        $(B)/output.o                         \
+        $(B)/precondn.o                       \
+        $(B)/pressure.o                       \
+        $(B)/printout.o                       \
+        $(B)/profil3d.o                       \
+        $(B)/readin.o                         \
+        $(B)/residue.o                        \
+        $(B)/restart.o                        \
+        $(B)/scalfor.o                        \
+        $(B)/spectrum.o                       \
+        $(B)/tomnsp.o                         \
+        $(B)/totzsp.o                         \
+        $(B)/trid.o                           \
+        $(B)/vsetup.o                         \
+        $(B)/wrout.o                          
+
+# -------------------------------------------------------------------------
+# -- Executable File
+# -------------------------------------------------------------------------
+
+X_FILES     =                                 \
+        $(X)/vmec.x
+
+# -------------------------------------------------------------------------
+# -- Default Rules and Suffixes
+# -------------------------------------------------------------------------
+
+.SUFFIXES:
+
+# -------------------------------------------------------------------------
+# -- Dependency Rules and Explicit Dependencies
+# -------------------------------------------------------------------------
+
+all: FIRST_ACTION \
+     $(X_FILES)   \
+     LAST_ACTION
+
+$(X_FILES): dirs $(O_FILES)
+	@echo " ### LINKING $@... ###"
+	$(FC) $(FFLAGS) $(I_PATH) -o $@ $(O_FILES) $(EXT_O_FILES)
+
+clean:
+	@echo " ### CLEANING UP... ###"
+	rm -f $(X_FILES) core a.out $(X)/core $(X)/a.out
+	rm -f $(O_FILES)
+	rm -rf $(L)
+	@echo " ### DONE ###"
+
+dirs:
+#	mkdir -p $(B) $(L) $(X)
+
+FIRST_ACTION:
+	@echo " #############################"
+	@echo " ### UPDATING $(X_FILES)"
+	@echo " #############################"
+
+LAST_ACTION:
+	@echo " #############"
+	@echo " ### DONE. ###"
+	@echo " #############"
+
+$(B)/BLOCKDATA1.o                     : $(I)/name2.inc
+$(B)/BLOCKDATA1.o                     : $(I)/name0.inc
+$(B)/BLOCKDATA1.o                     : $(I)/name1.inc
+$(B)/BLOCKDATA1.o                     : $(S)/BLOCKDATA1.f
+$(B)/alias.o                          : $(I)/name2.inc
+$(B)/alias.o                          : $(I)/name0.inc
+$(B)/alias.o                          : $(I)/name1.inc
+$(B)/alias.o                          : $(S)/alias.f
+$(B)/bcovar.o                         : $(I)/name2.inc
+$(B)/bcovar.o                         : $(I)/name0.inc
+$(B)/bcovar.o                         : $(I)/name1.inc
+$(B)/bcovar.o                         : $(I)/name3.inc
+$(B)/bcovar.o                         : $(S)/bcovar.f
+$(B)/bss.o                            : $(I)/name2.inc
+$(B)/bss.o                            : $(I)/name0.inc
+$(B)/bss.o                            : $(I)/name1.inc
+$(B)/bss.o                            : $(I)/name3.inc
+$(B)/bss.o                            : $(S)/bss.f
+$(B)/convert.o                        : $(I)/name2.inc
+$(B)/convert.o                        : $(I)/name0.inc
+$(B)/convert.o                        : $(I)/name1.inc
+$(B)/convert.o                        : $(S)/convert.f
+$(B)/difvol.o                         : $(S)/difvol.f
+$(B)/eqfor.o                          : $(I)/name2.inc
+$(B)/eqfor.o                          : $(I)/name0.inc
+$(B)/eqfor.o                          : $(I)/name1.inc
+$(B)/eqfor.o                          : $(S)/eqfor.f
+$(B)/eqsolve.o                        : $(I)/name2.inc
+$(B)/eqsolve.o                        : $(I)/name0.inc
+$(B)/eqsolve.o                        : $(I)/name1.inc
+$(B)/eqsolve.o                        : $(S)/eqsolve.f
+$(B)/evolve.o                         : $(I)/name2.inc
+$(B)/evolve.o                         : $(I)/name0.inc
+$(B)/evolve.o                         : $(I)/name1.inc
+$(B)/evolve.o                         : $(S)/evolve.f
+$(B)/extrap.o                         : $(I)/name1.inc
+$(B)/extrap.o                         : $(S)/extrap.f
+$(B)/fixaray.o                        : $(I)/name2.inc
+$(B)/fixaray.o                        : $(I)/name0.inc
+$(B)/fixaray.o                        : $(I)/name1.inc
+$(B)/fixaray.o                        : $(S)/fixaray.f
+$(B)/forces.o                         : $(I)/name2.inc
+$(B)/forces.o                         : $(I)/name0.inc
+$(B)/forces.o                         : $(I)/name1.inc
+$(B)/forces.o                         : $(I)/name3.inc
+$(B)/forces.o                         : $(I)/name4.inc
+$(B)/forces.o                         : $(S)/forces.f
+$(B)/funct3d.o                        : $(I)/name2.inc
+$(B)/funct3d.o                        : $(I)/name0.inc
+$(B)/funct3d.o                        : $(I)/name1.inc
+$(B)/funct3d.o                        : $(I)/name3.inc
+$(B)/funct3d.o                        : $(I)/name4.inc
+$(B)/funct3d.o                        : $(S)/funct3d.f
+$(B)/functions90_it.o                 : $(S)/functions90_it.f
+$(B)/getfsq.o                         : $(I)/name2.inc
+$(B)/getfsq.o                         : $(I)/name0.inc
+$(B)/getfsq.o                         : $(I)/name1.inc
+$(B)/getfsq.o                         : $(S)/getfsq.f
+$(B)/getiota.o                        : $(I)/name1.inc
+$(B)/getiota.o                        : $(S)/getiota.f
+$(B)/interp.o                         : $(I)/name2.inc
+$(B)/interp.o                         : $(I)/name0.inc
+$(B)/interp.o                         : $(I)/name1.inc
+$(B)/interp.o                         : $(S)/interp.f
+$(B)/jacobian.o                       : $(S)/jacobian.f
+$(B)/lamcal.o                         : $(I)/name2.inc
+$(B)/lamcal.o                         : $(I)/name0.inc
+$(B)/lamcal.o                         : $(I)/name1.inc
+$(B)/lamcal.o                         : $(S)/lamcal.f
+$(B)/output.o                         : $(I)/name2.inc
+$(B)/output.o                         : $(I)/name0.inc
+$(B)/output.o                         : $(I)/name1.inc
+$(B)/output.o                         : $(S)/output.f
+$(B)/precondn.o                       : $(I)/name1.inc
+$(B)/precondn.o                       : $(S)/precondn.f
+$(B)/pressure.o                       : $(S)/pressure.f
+$(B)/printout.o                       : $(I)/name2.inc
+$(B)/printout.o                       : $(I)/name0.inc
+$(B)/printout.o                       : $(I)/name1.inc
+$(B)/printout.o                       : $(S)/printout.f
+$(B)/profil3d.o                       : $(I)/name2.inc
+$(B)/profil3d.o                       : $(I)/name0.inc
+$(B)/profil3d.o                       : $(I)/name1.inc
+$(B)/profil3d.o                       : $(S)/profil3d.f
+$(B)/readin.o                         : $(I)/name2.inc
+$(B)/readin.o                         : $(I)/name0.inc
+$(B)/readin.o                         : $(I)/name1.inc
+$(B)/readin.o                         : $(S)/readin.f
+$(B)/residue.o                        : $(I)/name2.inc
+$(B)/residue.o                        : $(I)/name0.inc
+$(B)/residue.o                        : $(I)/name1.inc
+$(B)/residue.o                        : $(S)/residue.f
+$(B)/restart.o                        : $(I)/name2.inc
+$(B)/restart.o                        : $(I)/name0.inc
+$(B)/restart.o                        : $(I)/name1.inc
+$(B)/restart.o                        : $(S)/restart.f
+$(B)/scalfor.o                        : $(I)/name2.inc
+$(B)/scalfor.o                        : $(I)/name0.inc
+$(B)/scalfor.o                        : $(I)/name1.inc
+$(B)/scalfor.o                        : $(S)/scalfor.f
+$(B)/scopy.o                          : $(S)/scopy.f
+$(B)/sdot.o                           : $(S)/sdot.f
+$(B)/second.o                         : $(S)/second.f
+$(B)/spectrum.o                       : $(I)/name2.inc
+$(B)/spectrum.o                       : $(I)/name0.inc
+$(B)/spectrum.o                       : $(I)/name1.inc
+$(B)/spectrum.o                       : $(S)/spectrum.f
+$(B)/sscal.o                          : $(S)/sscal.f
+$(B)/ssum.o                           : $(S)/ssum.f
+$(B)/tomnsp.o                         : $(I)/name2.inc
+$(B)/tomnsp.o                         : $(I)/name0.inc
+$(B)/tomnsp.o                         : $(I)/name1.inc
+$(B)/tomnsp.o                         : $(S)/tomnsp.f
+$(B)/totzsp.o                         : $(I)/name2.inc
+$(B)/totzsp.o                         : $(I)/name0.inc
+$(B)/totzsp.o                         : $(I)/name1.inc
+$(B)/totzsp.o                         : $(S)/totzsp.f
+$(B)/trid.o                           : $(I)/name1.inc
+$(B)/trid.o                           : $(S)/trid.f
+$(B)/vmec.o                           : $(I)/name1.inc
+$(B)/vmec.o                           : $(S)/vmec.f
+$(B)/vsetup.o                         : $(I)/name2.inc
+$(B)/vsetup.o                         : $(I)/name0.inc
+$(B)/vsetup.o                         : $(I)/name1.inc
+$(B)/vsetup.o                         : $(I)/name3.inc
+$(B)/vsetup.o                         : $(S)/vsetup.f
+$(B)/wrout.o                          : $(I)/name2.inc
+$(B)/wrout.o                          : $(I)/name0.inc
+$(B)/wrout.o                          : $(I)/name1.inc
+$(B)/wrout.o                          : $(I)/name3.inc
+$(B)/wrout.o                          : $(S)/wrout.f
+
+$(O_FILES):
+	@echo " "
+	@echo " ### COMPILING $(S)/$(@F:.o=.f) ###"
+	$(FC) $(FFLAGS) $(I_PATH) -c -o $@ $(S)/$(@F:.o=.f)

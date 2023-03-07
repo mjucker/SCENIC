@@ -1,0 +1,95 @@
+#!/bin/bash
+#PBS -l mppwidth=1032
+#PBS -l walltime=05:00:00
+#PBS -m eab
+#PBS -M martin.jucker@epfl.ch
+##PBS -V
+
+nprocs=516
+ppn=6
+
+set -ex
+
+uname -a
+
+
+
+INPUT=dataQAX
+RUNDIR=run
+SIMDIR=sim
+EQDIR=QAX_resize/lfs
+RUNID=722113
+
+cd $HOME/$RUNDIR/
+
+if [ $RUNID -eq 0 ]; then
+    rm -f $SIMDIR/*
+    cp $EQDIR/* $SIMDIR/
+    cp vmec.x tprbap.x eqtransf_bap venus.x convertPpla leman $SIMDIR/
+    cp $INPUT $SIMDIR/
+fi
+
+
+cd $HOME/$RUNDIR/$SIMDIR/
+
+if [ -e stopsim ]; then
+    rm stopsim
+fi
+
+TOTAL=100
+COUNTER=1 
+while [ $COUNTER -lt $TOTAL ]; do
+
+
+    if [ $RUNID -eq 0 ]; then
+	tmp=$(echo $PBS_JOBID);RUNID=722113
+    fi
+
+    if [ -e 'it'$COUNTER'_'$RUNID'.tar' ]; then
+	let COUNTER=COUNTER+1 
+    else
+	TOTAL=$COUNTER
+    fi
+done
+	
+
+OUTPUT='venus_'$COUNTER
+	
+# VENUS
+export OMP_NUM_THREADS=1
+aprun -n $nprocs -N $ppn ./venus.x< $INPUT > $OUTPUT 
+
+# save outputs
+
+DIRNAME='it'$COUNTER'_'$RUNID'.tar'
+
+tar -cf $DIRNAME $INPUT $OUTPUT state.vs fort.11 fort.13 fort.14 thermal.in moments.in profiles.in fort.39 fort.59 fort.69 fort.79 fort.89
+
+
+cat fort.79>>f79
+
+if [ -e checkpoint ]; then
+    echo ' '
+    echo '***************************************'
+    echo STOPPING FOR CHECKPOINT
+    echo '***************************************'
+    echo ' '
+    rm checkpoint
+elif [ -e stopsim ]; then 
+    echo ' '
+    echo '***************************************'
+    echo STOPPING SIMULATION
+    echo '***************************************'
+    echo ' '
+    rm stopsim
+else
+    cd $HOME/$RUNDIR/
+    cp lemstart lemit
+    sed s/www/$RUNID/g -i lemit
+    sed s/yyy/$COUNTER/g -i lemit
+    sed s/zzz/$SIMDIR/g -i lemit
+    qsub lemit
+fi
+
+
+

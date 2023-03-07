@@ -1,0 +1,34 @@
+               LHD-bal
+C
+C        MM  NMIN  NMAX   MMS NSMIN NSMAX NPROCS INSOL
+         30     0     0    30    -3    30     1     0
+C
+C     TABLE OF FOURIER COEFFIENTS FOR BOOZER COORDINATES
+C     EQUILIBRIUM SETTINGS ARE COMPUTED FROM FIT/VMEC
+C
+C M=  0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6  N
+      1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 0 0 0 0 0 0  0
+C
+      LLAMPR      LVMTPR      LMETPR      LRIPPL
+           0           0           0           0
+      LRADMN      LRADMX      LNBALN      LNBALX
+           1         128           0           0
+      LXYZPR      LIOTPL      LSKEWN      LMXBAL
+           0           1           1          30
+      LCURRF      LMESHP      LMESHV      LITERS
+           1           1           3           1
+      LXYZPL      LEFPLS      LEQVPL      LPRESS
+           1           1           0           0
+C
+C    PVAC        PARFAC      QONAX        QN         DSVAC       QVAC    NOWALL
+  1.5000e-00  0.0000e-00  0.6500e-00  0.0000e-00  1.0000e-00  1.5000e-00      1
+C
+C    AWALL       EWALL       DWALL       GWALL       DRWAL       DZWAL   NPWALL
+  2.0000e-00  1.0000e-00  0.0000e-01  0.0000e-00  0.0000e-01  0.0000e-00      0
+C
+C    RPLMIN       XPLO        DJP         WCT       CURFAC
+  1.0000e-05  1.0000e-06  1.0000e-02  0.0000e-02  1.0000e-00
+C
+C   T--AXIS      ZEFF   DENSITY PEDESTAL AND POWER COEFFS  BOOTS. ITER
+  1.5000e+01  1.0000e-00  0.9990e-00  1.0000e-00        2  2
+

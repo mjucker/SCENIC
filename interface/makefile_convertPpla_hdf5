@@ -1,0 +1,5 @@
+FUTILS=../venus/futils/src
+HDF5=/usr/local/hdf5
+mpif90 -I $FUTILS -I$HDF5/lib -I$HDF5/include -c convertPpla_hdf5.f
+mpif90 -i-dynamic -L$FUTILS -L$HDF5/lib -L/usr/local/szip/lib convertPpla_hdf5.o -lfutils -lhdf5_fortran -lhdf5 -lsz -lz
+mv a.out convertPpla

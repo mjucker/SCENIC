@@ -1,0 +1,47 @@
+FFTW=/apps/fftw2/64
+#FFTW=/usr/local/fftw-2.1.5-32
+
+FFTWLIB=-L$(FFTW)/lib -ldfftw
+FFTWINC=-I$(FFTW)/include
+
+PROG =	leman
+
+SRCS =  erf.f fields.f inout.f math.f matrix.f unicity.f walltime.f transition.f main.f
+
+OBJS = erf.o fields.o inout.o math.o matrix.o unicity.o walltime.o transition.o main.o
+
+
+LIBS =  -lesslsmp -lxlsmp
+
+#LIBS =  -L/usr/local/intel/mkl72/lib/32 -lmkl_lapack \
+#	     -lmkl_p4 -lguide -lpthread
+
+CC = cc
+CFLAGS = -O
+FC = mpfort
+FFLAGS = -compiler xlf90_r -q64 -O5 -k -qsmp=omp -qreport=smplist $(FFTWINC) 
+#FFLAGS = -CB -CA -w -g -FR $(FFTWINC) -openmp
+#FFLAGS = -CB -FR $(FFTWINC)
+F90 = $(FC)
+F90FLAGS = $(FFLAGS)
+LDFLAGS = -compiler xlf90_r -q64 -qsmp=omp
+
+all: $(PROG)
+
+$(PROG): $(OBJS)
+	$(FC) $(LDFLAGS) -o $@ $(OBJS) $(LIBS) $(FFTWLIB)
+
+clean:
+	rm -f $(PROG) $(OBJS) *.mod
+
+.SUFFIXES: $(SUFFIXES) .f90
+
+.f90.o:
+	$(F90) $(F90FLAGS) -c $<
+
+math.o: cputime.inc
+matrix.o: math.o
+main.o: math.o matrix.o unicity.o
+inout.o: math.o matrix.o
+unicity.o: math.o matrix.o
+fields.o: math.o matrix.o

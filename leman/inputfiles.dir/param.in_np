@@ -1,0 +1,113 @@
+ ! Parameters for the 2D version of the "Waves3D"
+
+&InputNameList
+  EQPATH='',
+  GRIDPATH='',
+  OUTPUTPATH='',
+
+
+  Ra=1.0,    ! Plasma radius ! Not used presently
+  Rw=1.0,    ! Wall radius ! Not used presently
+  mp_SI = 1.67e-27, ! A=1 ion mass, kg
+  me_SI = 9.10e-31, ! electron mass, kg
+  iA1  = 2.0,     ! Ion atomic weights
+  ifr1 = 1.0,  ! ... and fractions
+  iZ1  = 1.0,  ! ... and charge
+  iA2  = 1.0,     !
+  ifr2 = 0.0,  !
+  iZ2  = 1.0,  !
+
+  ! Plasma density and temperature profile parameters
+  n0_SI  = 5.0E+19,  ! Plasma density at the magnetic axis, 1/m^3
+  np0=1.0, np1=-1.0, np2=0.0, np3=0.0, np4=0.0, np5=-0.0, ! Density coeffs
+
+  Ti0 = 1.0E4,    ! Ion temperature at the magnetic axis, eV
+  Tip0=1.0, Tip1=-1.0, Tip2=0.0, Tip3=0.0, Tip4=0.0, Tip5=0.0,
+
+  Te0 = 1.0E4,    ! Electron temperature at the magnetic axis, eV
+  Tep0=1.0, Tep1=-1.0, Tep2=0.0, Tep3=0.0, Tep4=0.0, Tep5=0.0,
+
+  ArtBorder = 1.00 ! Artificial vacuum border (1.0 to have no border)
+  UseDensCoeffs=3, !Use density coeffs or an implemented profile or the file 'moments.in'
+  UseTempCoeffs=3, !Use temp coeffs or an implemented profile or the file 'moments.in'
+
+  B0=3.36,  ! parallel magnetic field on the axis, T
+
+  DielTensor = 6  ! plasma model :  1 - full cold plasma dielectric tensor
+                  !                 2 - 'Andre' model (imaginary eps_parallel)
+                  !                 3 - vacuum  E = I
+                  !                 5 - full cold plasma, om_e = om_e*(1 + i*delta)
+                  !                 6 - warm model with approximated k||
+  kparApprox = 1, ! approx used for k|| :  1 -  k|| = n/R
+                  !                        2 -  k|| = 1/(2qR)
+                  !                        3 -  k|| = omega/c_A
+
+
+  Om_SI1=1.4e8,  ! Excitation frequency range, 1/rad; Number of steps (0 == one run with Om1)
+  Om_SI2=1.24e6,
+  OmSteps=0,  ! Number of freq. steps (0 == one run with Om1)
+  om_im= 5.0e-3,  ! Imaginary part in the frequency
+  om_imi=5.0e-3,  ! Imaginary part in the frequency
+
+! Antenna
+  ant_type = 1,  ! Types: 0 -- global antenna
+                 !        1 -- directionaly localised antenna
+                 !        2 -- localised antenna
+  m_shape=1,  ! Shape of the antenna
+  n_shape=0,  ! Must be perpendicular to the considered mode
+  m_ant=0,   ! Antenna: poloidal mode
+  n_ant=15,  ! Antenna: toroidal mode
+  s_ant_min = 0.91,  ! Antenna radial extension
+  s_ant_max = 0.98,  !
+  theta_ant1 = 340.0,  ! Antenna, poloidal/toroidal extension (degrees, geometrical angle)
+  theta_ant2 = 20.0,  ! Antenna type:
+                       ! 0: theta_ant1 and theta_ant2 not used
+                       ! 1: theta_ant1 and theta_ant2 give the poloidal extension at phi=0
+                       !    mirror case: theta_ant1 and theta_ant2 give toroidal extension
+  theta_ant3 = 120.0,  ! 2: theta_ant1 and theta_ant2 give poloidal extension, theta_ant3 and
+  theta_ant4 = 240.0,  !    theta_ant4 give toroidal extension
+
+! Equilibrium:
+  CylMetric = F,  ! "T" means 1D cylindrical metric
+  ! nperiod,m/neq_cyl,ampl_cyl,s1/2_cyl,RRcyl are used for "cylindrical" metric only
+  nperiod = 60,    ! number of toroidal periods
+  meq_cyl = 0,    ! 
+  neq_cyl = 0,    ! fourier modes of extra 3D terms in the equilibrium
+  ampl_cyl = 0.0, ! amplitude of the 3D terms in the eq.
+  s1_cyl = 0.2,   ! 
+  s2_cyl = 0.8,   ! radial extent of the 3D terms
+  RRcyl = 1.0,   ! if CylMetric=T RRcyl is used for the jacobian (RR/2)
+  ! Attention! the following values should be estimated from the eq. mode table (after run)
+  ! Only the modes with |m|<=mEqMax/,|n|<nEqMax contribute to the equilibrium
+  ! temporarily turned off
+  mEqMax= 4, ! maximum non-zero poloidal F. mode for equilibrium decomposition
+  nEqMax= 1, ! maximum non-zero toroidal F. mode for equilibrium decomposition
+               ! ^^^ don't forget *3!!!!
+
+  PrecalcMatrix=0,  ! Use precalculated matrix?
+  MaxResponseFreq=0,  ! Max response freq. calculation?
+  EmptyRun=0,  ! Do not actually construct the matrix (can be used for the 
+               ! equil. interpolation and looking for cylinder Alfven resonances)
+  OutputFlags=F,F,
+  FourierCheck=0, ! Perform a check on the Fourier Transform.
+                  ! To gain memory, disable it.
+  KKMem=1600,  ! In MB. Max RAM memory used to store the main matrix and its temporary arrays.
+               ! The remaining part is written on the local disk.
+  ParaMethod=1, ! Parallelisation: 1 -  Normal
+                !                  2 -  n distributed over nodes
+  nwidth=16,    ! Only used when ParaMethod=2, gives the witdh of the table in n
+               ! Only valid for a tokamak, the lowest value of n is given by
+               ! AFtable and the increment is nperiod
+  np_npar=4,   ! Number of processors involve in n number parallelisation
+/
+
+
+
+
+
+
+
+
+
+
+

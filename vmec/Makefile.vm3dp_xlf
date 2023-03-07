@@ -1,0 +1,76 @@
+#
+#  Makefile 
+#  000725 by Stefan Haberhauer NEC-ESS; modified by Anthony Cooper
+#
+
+# Suffixes rule
+.SUFFIXES :
+.SUFFIXES : .o .f 
+
+# F90 compiler
+#F90 = sxf90
+#F90 = f90
+F90 = xlf
+
+# options to invalidate environment variable for F90
+CLEARFLAGS = 
+#-clear 
+
+# F90 user compile options
+#FFLOAT = -float0 -ew -sx4
+#FFLOAT = -float0 -ew -sx5
+#FFLOAT = -w -r8 -i4 -O3 -tpp2 -fnsplit -ftz -ip -ipo
+FFLOAT = -q64 -qintsize=4 -qrealsize=8 -O5 -qarch=pwr5 -qtune=pwr5 -qnosave -qstrict
+#float2 FFLOAT = -float2 -sx4
+#FHOPT = -Chopt
+#FBASE = -P stack -f0 -eb \
+#        -Wf,-pvctl noassume loopcnt=100000 vr256 vwork=stack vworksz=4M noverrchk novlchk matmul
+#FFLAGS = ${FFLOAT} ${FBASE} 
+FFLAGS = ${FFLOAT}
+
+# linker
+LD = ${F90}
+
+# link options
+LDFLAGS = ${FFLOAT}
+
+# link library
+#LIBRARY = -leispack_64 -lblas_64
+##float2 LIBRARY = -leispack -lblas
+
+EXEC = vm3dbm90.x
+
+FSRCS = vm3dbm90.f
+
+OBJS = 	vm3dbm90.o
+
+
+${EXEC} : ${OBJS} 
+	${LD} ${CLEARFLAGS} -o ${EXEC} ${LDFLAGS} ${OBJS} ${LIBRARY}
+#
+# General rule
+.f.o :
+	${F90} ${CLEARFLAGS} -c ${FINL} ${FFLAGS} $<
+
+# High optimization
+#lamnew.o: lamnew.f
+# 	${F90} ${CLEARFLAGS} -c ${FHOPT} ${FFLAGS} $<
+#
+#sgefa.o: sgefa.f
+#	${F90} ${CLEARFLAGS} -c ${FHOPT} ${FFLAGS} $<
+# 
+#vmtobo.o: vmtobo.f
+#	${F90} ${CLEARFLAGS} -c ${FHOPT} ${FFLAGS} $<
+
+#mtaskb.o: mtaskb.f
+#	${F90} ${CLEARFLAGS} -c ${FFLAGS} $<
+
+newcase:
+	@rm vm3dbm90.o
+	make
+
+clean :
+	@rm -f ${EXEC} ${OBJS} *.L
+
+
+# Dependencies of FORTRAN source files

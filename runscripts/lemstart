@@ -1,0 +1,126 @@
+#!/bin/bash
+#PBS -l mppwidth=4,mppnppn=1,mppdepth=6
+#PBS -l walltime=05:00:00
+#PBS -m eab
+#PBS -M martin.jucker@epfl.ch
+##PBS -V
+
+
+
+set -ex
+
+uname -a
+
+RUNDIR=run
+RUNID=www
+COUNTER=yyy
+SIMDIR=zzz
+
+cd $HOME/$RUNDIR/$SIMDIR/
+
+if [ -e stopsim ]; then
+    rm stopsim
+fi
+
+# Equilibrium
+    ./vmec.x<vmdata
+    if [ -e VMEC_ERROR ]; then
+	echo ' '
+	echo '***************************************'
+	echo STOPPING DUE TO VMEC ERROR
+	echo '***************************************'
+	echo ' '
+    else
+	grep beta fort.3
+	TERPOUT='terp_'$COUNTER
+	./tprbap.x < terp_in > $TERPOUT
+	./eqtransf_bap
+
+# LEMan
+	params=$(cat toroid.in)
+
+	COUNTL=0
+	for parval in $params
+
+	  do
+      
+
+	  if [ $COUNTL -eq 0 ]; then
+	      echo nph = $parval
+	      TOT=$parval
+#	  echo $COUNTL
+	  else
+
+#	  echo $COUNTL
+#
+	      if [ $COUNTL -gt $TOT ]; then
+		  break
+	      fi
+
+	      OUTL='fort.27_'$COUNTL
+#	  OUTL='fort.27_1'
+#
+	      cp AFtable_temp AFtable.txt
+	      sed s/xxx/$parval/g -i AFtable.txt
+	      cp DTtable_temp DTtable.txt
+	      sed s/xxx/$parval/g -i DTtable.txt
+	      cp param_temp param.in
+	      sed s/xxx/$parval/g -i param.in
+	      
+	      export OMP_NUM_THREADS=6
+	      aprun -n 4 -N 1 -d 6 ./leman<param.in
+	      ./convertPpla
+	      cp fort.27 $OUTL 
+#
+	  fi
+	  let COUNTL=$COUNTL+1
+	done
+	if [ -e LEMAN_ERROR ]; then
+	    echo ' '
+	    echo '***************************************'
+	    echo STOPPING DUE TO LEMAN ERROR
+	    echo '***************************************'
+	    echo ' '
+	fi
+	
+    fi
+
+DIRNAME='it'$COUNTER'_'$RUNID'.tar'
+
+tar -rf $DIRNAME grid.dat fort.37 fort.27_*
+
+
+echo ' '
+echo '***************************************'
+echo Iteration $COUNTER done
+echo '***************************************'
+echo ' '
+
+ERROR=0
+if [ -e checkpoint ]; then
+    COUNTER=$TOTAL
+    rm checkpoint
+    ERROR=1
+fi
+if [ -e VMEC_ERROR ]; then
+    COUNTER=$TOTAL
+    rm VMEC_ERROR
+    ERROR=1
+fi
+if [ -e LEMAN_ERROR ]; then
+    COUNTER=$TOTAL
+    rm LEMAN_ERROR
+    ERROR=1
+fi
+if [ -e stopsim ]; then
+    COUNTER=$TOTAL
+    rm stopsim
+    ERROR=1
+fi
+
+if [ $ERROR -eq 0 ]; then
+    cd $HOME/$RUNDIR/
+    sed s/RUNID=..*$/RUNID=$RUNID/g -i venusit
+    sed s/SIMDIR=..*$/SIMDIR=$SIMDIR/g -i venusit
+    qsub venusit
+fi
